@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <limits>
+#include <random>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ void Game::run() {
 				}
 			}
 		} else if (choice == "2") {
-			std::cout << "Démarrer un combat (non implémenté encore).\n";
+			startCombat();
 		} else if (choice == "3") {
 			std::cout << "Nom: " << player_->getName() << "\n";
 			std::cout << "HP: " << player_->getHP() << "/" << player_->getHPMax() << "\n";

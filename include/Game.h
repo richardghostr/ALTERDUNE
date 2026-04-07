@@ -16,6 +16,8 @@ public:
 
 	bool loadData(const std::string &itemsFile, const std::string &monstersFile);
 	void run();
+	// start a single combat (returns true if game should continue, false to end)
+	void startCombat();
 
 private:
 	std::unique_ptr<Player> player_;

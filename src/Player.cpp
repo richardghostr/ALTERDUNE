@@ -32,3 +32,6 @@ void Player::heal(int amount) { hp_ += amount; if (hp_ > hpMax_) hp_ = hpMax_; }
 int Player::getKills() const { return kills_; }
 int Player::getSpares() const { return spares_; }
 
+void Player::incKills() { ++kills_; }
+void Player::incSpares() { ++spares_; }
+

@@ -26,6 +26,8 @@ public:
 	// stats accessors
 	int getKills() const;
 	int getSpares() const;
+	void incKills();
+	void incSpares();
 
 private:
 	std::unique_ptr<Inventory> inventory_;

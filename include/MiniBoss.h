@@ -7,7 +7,7 @@
 class MiniBoss : public Monster {
 public:
 	MiniBoss() = default;
-	MiniBoss(const std::string &name, int hpMax);
+	MiniBoss(const std::string &name, int hpMax, int atk, int def, int mercyGoal = 100);
 	~MiniBoss() override = default;
 
 	int actCount() const override;

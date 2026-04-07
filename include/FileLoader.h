@@ -6,6 +6,7 @@
 #include "Monster.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace FileLoader {
 	bool loadItems(const std::string &path, std::vector<Item> &out);

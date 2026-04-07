@@ -4,14 +4,15 @@
 
 #include "Item.h"
 #include <vector>
-#include <optional>
 
 class Inventory {
 public:
 	Inventory() = default;
 
 	void addItem(const Item &it);
-	std::optional<Item> getItem(const std::string &name) const;
+	// Return pointer to item (nullptr if not found)
+	const Item *getItem(const std::string &name) const;
+	// Use an item: decrement quantity and return true if successful
 	bool useItem(const std::string &name);
 	const std::vector<Item> &items() const;
 

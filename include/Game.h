@@ -5,6 +5,9 @@
 #include "Player.h"
 #include "Bestiary.h"
 #include <memory>
+#include <vector>
+
+#include "Monster.h"
 
 class Game {
 public:
@@ -17,6 +20,7 @@ public:
 private:
 	std::unique_ptr<Player> player_;
 	Bestiary bestiary_;
+	std::vector<std::unique_ptr<Monster>> monsters_;
 };
 
 #endif // ALTERDUNE_GAME_H

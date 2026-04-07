@@ -3,10 +3,11 @@
 #define ALTERDUNE_PLAYER_H
 
 #include "Entity.h"
+#include "Item.h"
+#include "Inventory.h"
 #include <memory>
 #include <string>
-
-class Inventory;
+#include <vector>
 
 class Player : public Entity {
 public:
@@ -14,7 +15,12 @@ public:
 	Player(const std::string &name, int hpMax);
 	~Player() override = default;
 
-	void useItem(const std::string &itemId);
+	// use an item by name; returns true if used
+	bool useItem(const std::string &itemId);
+	void addItem(const Item &it);
+	const std::vector<Item> &listItems() const;
+
+	void setName(const std::string &name);
 	void heal(int amount);
 
 	// stats accessors

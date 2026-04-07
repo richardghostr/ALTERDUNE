@@ -7,7 +7,7 @@
 class Boss : public Monster {
 public:
 	Boss() = default;
-	Boss(const std::string &name, int hpMax);
+	Boss(const std::string &name, int hpMax, int atk, int def, int mercyGoal = 100);
 	~Boss() override = default;
 
 	int actCount() const override;

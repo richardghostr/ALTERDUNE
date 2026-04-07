@@ -19,6 +19,10 @@ public:
 	// start a single combat (returns true if game should continue, false to end)
 	void startCombat();
 
+	// Accessors for tests / GUI
+	Player *getPlayer();
+	Bestiary &getBestiary();
+
 private:
 	std::unique_ptr<Player> player_;
 	Bestiary bestiary_;

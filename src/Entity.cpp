@@ -1,0 +1,2 @@
+// src/Entity.cpp - placeholder
+

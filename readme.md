@@ -24,20 +24,55 @@ Vous pouvez leur parler, les complimenter, leur faire des blagues... et les épa
 
 ### Compilation et lancement
 
-```bash
-# 1. Aller dans le dossier du projet
-cd ALTERDUNE-main
+Vous pouvez compiler et lancer le jeu de plusieurs manières selon votre environnement.
 
-# 2. Compiler le projet (génère l'exécutable "alterdune")
+Option A — Utiliser le `Makefile` (recommandé)
+
+```bash
+# Depuis la racine du projet
+# Linux / macOS
 make
 
-# 3. Lancer le jeu
-./alterdune
+# Windows (MinGW / MSYS2)
+mingw32-make
+
+# Le binaire produit par la cible Makefile est :
+# - ./alterdune (Unix)
+# - alterdune.exe (Windows)
 ```
+
+Option B — Compiler directement avec `g++` (PowerShell / CMD / bash)
+
+PowerShell (Windows) — crée le dossier de sortie puis compile :
+
+```powershell
+if (!(Test-Path -Path src\output)) { New-Item -ItemType Directory -Path src\output }
+g++ -std=c++17 -Wall -Wextra -Iinclude -g src/*.cpp -o src/output/main.exe
+.\src\output\main.exe
+```
+
+Bash (Linux / macOS) :
+
+```bash
+mkdir -p src/output
+g++ -std=c++17 -Wall -Wextra -Iinclude -g src/*.cpp -o src/output/main
+./src/output/main
+```
+
+Remarques :
+- Le `Makefile` (cible par défaut) produit un exécutable `alterdune` à la racine du projet sous Windows il sera nommé `alterdune.exe`.
+- Lancez l'exécutable depuis la racine du projet afin que les fichiers `data/items.csv` et `data/monsters.csv` soient trouvés par `main`.
+- Sous PowerShell, si vous avez des caractères box-drawing/UTF-8 illisibles, exécutez `chcp 65001` avant de lancer le jeu pour forcer l'encodage UTF-8.
 
 Pour repartir de zéro (supprimer les fichiers compilés) :
 ```bash
+# Avec Makefile
 make clean
+# ou sous Windows avec MinGW
+mingw32-make clean
+
+# suppression manuelle (si vous avez compilé avec g++)
+Remove-Item src\output\main.exe
 ```
 
 ---

@@ -1,4 +1,4 @@
-// src/Game.cpp - Game implementation (skeleton)
+// src/Game.cpp
 #include "../include/Game.h"
 #include "../include/FileLoader.h"
 #include "../include/ActAction.h"
@@ -6,148 +6,242 @@
 #include "../include/MiniBoss.h"
 #include "../include/Boss.h"
 #include <iostream>
-
-#include <limits>
 #include <random>
 
 using namespace std;
 
+// ─────────────────────────────────────────────
+// Utilitaire
+// ─────────────────────────────────────────────
+static std::string categoryToString(MonsterCategory c) {
+	switch (c) {
+		case MonsterCategory::NORMAL:  return "NORMAL";
+		case MonsterCategory::MINIBOSS: return "MINIBOSS";
+		case MonsterCategory::BOSS:    return "BOSS";
+	}
+	return "UNKNOWN";
+}
+
+// ─────────────────────────────────────────────
+// Chargement des données
+// ─────────────────────────────────────────────
 bool Game::loadData(const std::string &itemsFile, const std::string &monstersFile) {
 	std::vector<Item> items;
 	if (!FileLoader::loadItems(itemsFile, items)) {
-		std::cerr << "Failed to open items file: " << itemsFile << "\n";
+		std::cerr << "[ERREUR] Impossible d'ouvrir le fichier items : " << itemsFile << "\n";
 		return false;
 	}
 
 	std::vector<std::unique_ptr<Monster>> monsters;
 	if (!FileLoader::loadMonsters(monstersFile, monsters)) {
-		std::cerr << "Failed to open monsters file: " << monstersFile << "\n";
+		std::cerr << "[ERREUR] Impossible d'ouvrir le fichier monstres : " << monstersFile << "\n";
 		return false;
 	}
 
-	// create player with default HP and give initial items
 	player_ = std::make_unique<Player>("", 100);
 	for (const auto &it : items) player_->addItem(it);
-
 	monsters_ = std::move(monsters);
 	return true;
 }
 
+// ─────────────────────────────────────────────
+// Résumé initial
+// ─────────────────────────────────────────────
+void Game::showSummary() {
+	cout << "\n╔══════════════════════════════╗\n";
+	cout << "  Bienvenue, " << player_->getName() << " !\n";
+	cout << "  HP : " << player_->getHP() << " / " << player_->getHPMax() << "\n";
+	cout << "  Inventaire :\n";
+	const auto &items = player_->listItems();
+	if (items.empty()) {
+		cout << "    (vide)\n";
+	} else {
+		for (const auto &it : items)
+			cout << "    - " << it.name << " x" << it.quantity
+			     << "  (soin : " << it.value << " HP)\n";
+	}
+	cout << "╚══════════════════════════════╝\n";
+}
+
+// ─────────────────────────────────────────────
+// Fin de partie
+// ─────────────────────────────────────────────
+void Game::checkEnding() {
+	int kills  = player_->getKills();
+	int spares = player_->getSpares();
+
+	cout << "\n╔══════════════════════════════╗\n";
+	cout << "  10 VICTOIRES - FIN DE PARTIE\n";
+	cout << "╚══════════════════════════════╝\n\n";
+
+	if (kills > 0 && spares == 0) {
+		cout << ">>> FIN GENOCIDAIRE <<<\n";
+		cout << "Tu as tue tous tes adversaires sans pitie.\n";
+		cout << "Le monde tremble a ton passage...\n";
+	} else if (spares > 0 && kills == 0) {
+		cout << ">>> FIN PACIFISTE <<<\n";
+		cout << "Tu as epargne chaque creature rencontree.\n";
+		cout << "La paix regne dans ALTERDUNE.\n";
+	} else {
+		cout << ">>> FIN NEUTRE <<<\n";
+		cout << "Tu as tue " << kills << " creature(s) et epargne " << spares << ".\n";
+		cout << "Un equilibre fragile entre clemence et violence.\n";
+	}
+
+	cout << "\nMerci d'avoir joue a ALTERDUNE !\n";
+	gameOver_ = true;
+}
+
+// ─────────────────────────────────────────────
+// Boucle principale
+// ─────────────────────────────────────────────
 void Game::run() {
 	if (!player_) player_ = std::make_unique<Player>("", 100);
 
-	std::cout << "Entrez le nom de votre personnage: ";
+	cout << "╔══════════════════════════════╗\n";
+	cout << "       ALTERDUNE RPG\n";
+	cout << "╚══════════════════════════════╝\n";
+	cout << "Entrez le nom de votre personnage : ";
 	std::string name;
 	std::getline(std::cin, name);
-	if (name.empty()) name = "Player";
+	if (name.empty()) name = "Inconnu";
 	player_->setName(name);
 
-	bool quit = false;
-	while (!quit) {
-		std::cout << "\n=== ALTERDUNE - Menu Principal ===\n";
-		std::cout << "1) Bestiaire\n2) Démarrer un combat\n3) Statistiques\n4) Items\n5) Quitter\n";
-		std::cout << "Choix: ";
+	showSummary();
+
+	while (!gameOver_) {
+		int victories = player_->getKills() + player_->getSpares();
+
+		// Vérification fin de partie
+		if (victories >= 10) {
+			checkEnding();
+			break;
+		}
+
+		cout << "\n=== MENU PRINCIPAL === (Victoires : " << victories << "/10)\n";
+		cout << "1) Bestiaire\n2) Demarrer un combat\n3) Statistiques\n4) Items\n5) Quitter\n";
+		cout << "Choix : ";
 		std::string choice;
 		std::getline(std::cin, choice);
 
 		if (choice == "1") {
+			// ── Bestiaire ──
 			const auto &entries = bestiary_.entries();
 			if (entries.empty()) {
-				std::cout << "Bestiaire vide.\n";
+				cout << "Bestiaire vide. Aucun monstre vaincu pour l'instant.\n";
 			} else {
+				cout << "\n--- Bestiaire (" << entries.size() << " entree(s)) ---\n";
 				for (const auto &e : entries) {
-					std::cout << e.name << " (" << e.category << ") HP:" << e.hpMax
-							  << " ATK:" << e.atk << " DEF:" << e.def
-							  << " -> " << (e.spared ? "Épargné" : "Tué") << "\n";
+					cout << "  " << e.name
+					     << " [" << e.category << "]"
+					     << "  HP:" << e.hpMax
+					     << "  ATK:" << e.atk
+					     << "  DEF:" << e.def
+					     << "  -> " << (e.spared ? "Epargne" : "Tue") << "\n";
 				}
 			}
+
 		} else if (choice == "2") {
+			// ── Combat ──
 			startCombat();
+
 		} else if (choice == "3") {
-			std::cout << "Nom: " << player_->getName() << "\n";
-			std::cout << "HP: " << player_->getHP() << "/" << player_->getHPMax() << "\n";
-			std::cout << "Tués: " << player_->getKills() << "\n";
-			std::cout << "Épargnés: " << player_->getSpares() << "\n";
-			std::cout << "Victoires: " << (player_->getKills() + player_->getSpares()) << "\n";
+			// ── Statistiques ──
+			int v = player_->getKills() + player_->getSpares();
+			cout << "\n--- Statistiques ---\n";
+			cout << "  Nom       : " << player_->getName() << "\n";
+			cout << "  HP        : " << player_->getHP() << " / " << player_->getHPMax() << "\n";
+			cout << "  Tues      : " << player_->getKills() << "\n";
+			cout << "  Epargnes  : " << player_->getSpares() << "\n";
+			cout << "  Victoires : " << v << " / 10\n";
+
 		} else if (choice == "4") {
+			// ── Items ──
 			const auto &items = player_->listItems();
 			if (items.empty()) {
-				std::cout << "Inventaire vide.\n";
+				cout << "Inventaire vide.\n";
 			} else {
-				for (const auto &it : items) {
-					std::cout << it.name << " x" << it.quantity << " (" << it.value << " HP)\n";
-				}
-				std::cout << "Souhaitez-vous utiliser un item ? (nom ou vide): ";
+				cout << "\n--- Inventaire ---\n";
+				for (const auto &it : items)
+					cout << "  " << it.name
+					     << "  x" << it.quantity
+					     << "  (soin : " << it.value << " HP)\n";
+				cout << "Utiliser un item ? (nom ou vide pour annuler) : ";
 				std::string itemName;
 				std::getline(std::cin, itemName);
 				if (!itemName.empty()) {
-					if (player_->useItem(itemName)) std::cout << "Item utilisé.\n";
-					else std::cout << "Impossible d'utiliser cet item.\n";
+					if (player_->useItem(itemName))
+						cout << "Item utilise. HP : " << player_->getHP()
+						     << "/" << player_->getHPMax() << "\n";
+					else
+						cout << "Impossible d'utiliser cet item (nom incorrect ou quantite nulle).\n";
 				}
 			}
+
 		} else if (choice == "5") {
-			quit = true;
+			cout << "Au revoir, " << player_->getName() << " !\n";
+			gameOver_ = true;
+
 		} else {
-			std::cout << "Choix invalide.\n";
+			cout << "Choix invalide. Entrez 1, 2, 3, 4 ou 5.\n";
 		}
 	}
-	std::cout << "Au revoir.\n";
 }
 
-Player *Game::getPlayer() { return player_.get(); }
-
-Bestiary &Game::getBestiary() { return bestiary_; }
-
-static std::string categoryToString(MonsterCategory c) {
-	switch (c) {
-		case MonsterCategory::NORMAL: return "NORMAL";
-		case MonsterCategory::MINIBOSS: return "MINIBOSS";
-		case MonsterCategory::BOSS: return "BOSS";
-	}
-	return "UNKNOWN";
-}
-
+// ─────────────────────────────────────────────
+// Combat
+// ─────────────────────────────────────────────
 void Game::startCombat() {
 	if (monsters_.empty()) {
-		cout << "Aucun monstre disponible." << endl;
+		cout << "Aucun monstre disponible.\n";
 		return;
 	}
 
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dist(0, (int)monsters_.size() - 1);
-	int idx = dist(gen);
-	Monster *tmpl = monsters_[idx].get();
 
-	unique_ptr<Monster> enemy;
-	if (tmpl->category() == MonsterCategory::NORMAL) {
-		enemy = make_unique<Normal>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
-	} else if (tmpl->category() == MonsterCategory::MINIBOSS) {
-		enemy = make_unique<MiniBoss>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
-	} else {
-		enemy = make_unique<Boss>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
-	}
+	std::uniform_int_distribution<> dist(0, (int)monsters_.size() - 1);
+	Monster *tmpl = monsters_[dist(gen)].get();
+
+	// Créer une copie fraîche du monstre
+	std::unique_ptr<Monster> enemy;
+	if (tmpl->category() == MonsterCategory::NORMAL)
+		enemy = std::make_unique<Normal>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
+	else if (tmpl->category() == MonsterCategory::MINIBOSS)
+		enemy = std::make_unique<MiniBoss>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
+	else
+		enemy = std::make_unique<Boss>(tmpl->getName(), tmpl->getHPMax(), tmpl->getATK(), tmpl->getDEF(), tmpl->getMercyGoal());
 	enemy->setActIds(tmpl->actIds());
 
-	cout << "Un ennemi apparaît : " << enemy->getName() << " (" << categoryToString(enemy->category()) << ")" << endl;
+	cout << "\n*** Un ennemi apparait : "
+	     << enemy->getName()
+	     << " [" << categoryToString(enemy->category()) << "]"
+	     << "  HP:" << enemy->getHP() << " ***\n";
 
-	while (player_ && player_->isAlive() && enemy->isAlive()) {
-		cout << "\n-- Tour du joueur --" << endl;
-		cout << "1) FIGHT  2) ACT  3) ITEM  4) MERCY" << endl;
-		cout << "Choix: ";
-		string choice;
-		getline(cin, choice);
+	bool combatOver = false;
 
+	while (!combatOver && player_->isAlive() && enemy->isAlive()) {
+		cout << "\n  [Joueur: " << player_->getHP() << "/" << player_->getHPMax() << " HP]"
+		     << "  [" << enemy->getName() << ": " << enemy->getHP() << "/" << enemy->getHPMax() << " HP]"
+		     << "  [Mercy: " << enemy->getMercy() << "/" << enemy->getMercyGoal() << "]\n";
+		cout << "  1) FIGHT   2) ACT   3) ITEM   4) MERCY\n";
+		cout << "  Choix : ";
+		std::string choice;
+		std::getline(std::cin, choice);
+
+		// ── FIGHT ──
 		if (choice == "1") {
 			std::uniform_int_distribution<> dmgDist(0, enemy->getHPMax());
 			int dmg = dmgDist(gen);
-			if (dmg == 0) cout << "Votre attaque rate." << endl;
+			if (dmg == 0)
+				cout << "  Votre attaque rate !\n";
 			else {
 				enemy->takeDamage(dmg);
-				cout << "Vous infligez " << dmg << " dégâts. (HP ennemi: " << enemy->getHP() << ")" << endl;
+				cout << "  Vous infligez " << dmg << " degats."
+				     << " (HP ennemi : " << enemy->getHP() << ")\n";
 			}
 			if (!enemy->isAlive()) {
-				cout << "Monstre tué !" << endl;
+				cout << "  " << enemy->getName() << " est vaincu !\n";
 				player_->incKills();
 				BestiaryEntry e;
 				e.name = enemy->getName();
@@ -157,44 +251,59 @@ void Game::startCombat() {
 				e.def = enemy->getDEF();
 				e.spared = false;
 				bestiary_.add(e);
-				break;
+				combatOver = true;
 			}
+
+		// ── ACT ──
 		} else if (choice == "2") {
 			auto ids = enemy->actIds();
-			int maxActs = enemy->actCount();
-			cout << "Actions disponibles:" << endl;
-			for (int i = 0; i < maxActs && i < (int)ids.size(); ++i) {
+			int maxActs = std::min(enemy->actCount(), (int)ids.size());
+			cout << "  Actions disponibles :\n";
+			for (int i = 0; i < maxActs; ++i) {
 				const ActAction *a = findActById(ids[i]);
-				if (a) cout << i+1 << ") " << a->id << " - " << a->text << " (MercyImpact:" << a->mercyImpact << ")" << endl;
-				else cout << i+1 << ") " << ids[i] << " (UNKNOWN)" << endl;
+				if (a) cout << "    " << (i+1) << ") " << a->id
+				            << "  (Mercy " << (a->mercyImpact >= 0 ? "+" : "") << a->mercyImpact << ")\n";
+				else   cout << "    " << (i+1) << ") " << ids[i] << " (inconnue)\n";
 			}
-			cout << "Choix action (num): ";
-			string actChoice; getline(cin, actChoice);
-			int ai = 0; try { ai = stoi(actChoice) - 1; } catch (...) { ai = -1; }
-			if (ai >= 0 && ai < maxActs && ai < (int)ids.size()) {
+			cout << "  Choix action : ";
+			std::string actChoice;
+			std::getline(std::cin, actChoice);
+			int ai = -1;
+			try { ai = std::stoi(actChoice) - 1; } catch (...) {}
+			if (ai >= 0 && ai < maxActs) {
 				const ActAction *a = findActById(ids[ai]);
 				if (a) {
-					cout << a->text << endl;
+					cout << "\n  >> " << a->text << "\n";
 					enemy->modifyMercy(a->mercyImpact);
-					cout << "Mercy: " << enemy->getMercy() << "/" << enemy->getMercyGoal() << endl;
-				} else cout << "Action inconnue." << endl;
-			} else cout << "Choix invalide." << endl;
+					cout << "  Mercy : " << enemy->getMercy() << "/" << enemy->getMercyGoal() << "\n";
+				} else cout << "  Action inconnue.\n";
+			} else cout << "  Choix invalide.\n";
+
+		// ── ITEM ──
 		} else if (choice == "3") {
 			const auto &items = player_->listItems();
-			if (items.empty()) { cout << "Pas d'items." << endl; }
-			else {
-				cout << "Items:" << endl;
-				for (const auto &it : items) cout << it.name << " x" << it.quantity << endl;
-				cout << "Nom de l'item à utiliser (vide pour annuler): ";
-				string in; getline(cin, in);
+			if (items.empty()) {
+				cout << "  Pas d'items disponibles.\n";
+			} else {
+				for (const auto &it : items)
+					cout << "  " << it.name << " x" << it.quantity
+					     << "  (soin : " << it.value << " HP)\n";
+				cout << "  Nom de l'item (vide pour annuler) : ";
+				std::string in;
+				std::getline(std::cin, in);
 				if (!in.empty()) {
-					if (player_->useItem(in)) cout << "Item utilisé. HP joueur: " << player_->getHP() << "/" << player_->getHPMax() << endl;
-					else cout << "Impossible d'utiliser cet item." << endl;
+					if (player_->useItem(in))
+						cout << "  Item utilise. HP joueur : "
+						     << player_->getHP() << "/" << player_->getHPMax() << "\n";
+					else
+						cout << "  Impossible d'utiliser cet item.\n";
 				}
 			}
+
+		// ── MERCY ──
 		} else if (choice == "4") {
 			if (enemy->getMercy() >= enemy->getMercyGoal()) {
-				cout << "Vous épargnez le monstre !" << endl;
+				cout << "  Vous epargnez " << enemy->getName() << " !\n";
 				player_->incSpares();
 				BestiaryEntry e;
 				e.name = enemy->getName();
@@ -204,40 +313,45 @@ void Game::startCombat() {
 				e.def = enemy->getDEF();
 				e.spared = true;
 				bestiary_.add(e);
-				break;
+				combatOver = true;
 			} else {
-				cout << "Mercy insuffisante." << endl;
+				cout << "  Mercy insuffisante ("
+				     << enemy->getMercy() << "/" << enemy->getMercyGoal()
+				     << "). Utilisez des actions ACT d'abord.\n";
 			}
+
 		} else {
-			cout << "Choix invalide." << endl;
+			cout << "  Choix invalide.\n";
 		}
 
-		if (enemy->isAlive()) {
-			cout << "\n-- Tour du monstre --" << endl;
-			uniform_int_distribution<> dmgDist2(0, player_->getHPMax());
+		// ── Tour du monstre ──
+		if (!combatOver && enemy->isAlive()) {
+			std::uniform_int_distribution<> dmgDist2(0, player_->getHPMax());
 			int dmg = dmgDist2(gen);
-			if (dmg == 0) cout << "Le monstre rate son attaque." << endl;
+			cout << "\n  -- Tour du monstre --\n";
+			if (dmg == 0)
+				cout << "  " << enemy->getName() << " rate son attaque.\n";
 			else {
 				player_->takeDamage(dmg);
-				cout << "Le monstre inflige " << dmg << " dégâts. (HP joueur: " << player_->getHP() << ")" << endl;
+				cout << "  " << enemy->getName() << " inflige " << dmg
+				     << " degats. (HP joueur : " << player_->getHP() << ")\n";
 			}
 			if (!player_->isAlive()) {
-				cout << "Vous êtes mort. Fin de la partie." << endl;
-				exit(0);
+				cout << "\n  Vous etes mort. Fin de la partie.\n";
+				gameOver_ = true;
+				combatOver = true;
 			}
 		}
 	}
 
-	int victories = player_->getKills() + player_->getSpares();
-	cout << "Victoires: " << victories << endl;
-	if (victories >= 10) {
-		int kills = player_->getKills();
-		int spares = player_->getSpares();
-		if (kills > 0 && spares == 0) cout << "Fin Génocidaire" << endl;
-		else if (spares > 0 && kills == 0) cout << "Fin Pacifiste" << endl;
-		else cout << "Fin Neutre" << endl;
-		cout << "Merci d'avoir joué." << endl;
-		exit(0);
+	if (!gameOver_) {
+		int victories = player_->getKills() + player_->getSpares();
+		cout << "\n  Victoires totales : " << victories << "/10\n";
 	}
 }
 
+// ─────────────────────────────────────────────
+// Accessors
+// ─────────────────────────────────────────────
+Player  *Game::getPlayer()       { return player_.get(); }
+Bestiary &Game::getBestiary()    { return bestiary_; }

@@ -16,7 +16,6 @@ public:
 
 	bool loadData(const std::string &itemsFile, const std::string &monstersFile);
 	void run();
-	// start a single combat (returns true if game should continue, false to end)
 	void startCombat();
 
 	// Accessors for tests / GUI
@@ -24,10 +23,13 @@ public:
 	Bestiary &getBestiary();
 
 private:
+	void showSummary();
+	void checkEnding();
+
 	std::unique_ptr<Player> player_;
 	Bestiary bestiary_;
 	std::vector<std::unique_ptr<Monster>> monsters_;
+	bool gameOver_{false};
 };
 
 #endif // ALTERDUNE_GAME_H
-

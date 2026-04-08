@@ -1,0 +1,213 @@
+
+<style>
+#uml-wrap { padding: 8px 0; }
+#uml-wrap .mermaid { width: 100%; }
+</style>
+
+<div id="uml-wrap">
+  <div class="mermaid" id="uml-diagram">
+classDiagram
+  direction TB
+
+  class Entity {
+    &lt;&lt;abstract&gt;&gt;
+    #name_ : string
+    #hp_ : int
+    #hpMax_ : int
+    +Entity(name, hpMax)
+    +getName() string
+    +getHP() int
+    +getHPMax() int
+    +isAlive() bool
+    +takeDamage(dmg) void*
+  }
+
+  class Player {
+    -inventory_ : unique_ptr~Inventory~
+    -kills_ : int
+    -spares_ : int
+    +Player(name, hpMax)
+    +useItem(itemId) bool
+    +addItem(it) void
+    +listItems() vector~Item~
+    +setName(name) void
+    +heal(amount) void
+    +getKills() int
+    +getSpares() int
+    +incKills() void
+    +incSpares() void
+  }
+
+  class Monster {
+    &lt;&lt;abstract&gt;&gt;
+    #category_ : MonsterCategory
+    #mercy_ : int
+    #mercyGoal_ : int
+    #actIds_ : vector~string~
+    #atk_ : int
+    #def_ : int
+    +Monster(name, cat, hpMax, atk, def, mercyGoal)
+    +category() MonsterCategory
+    +getMercy() int
+    +getMercyGoal() int
+    +modifyMercy(delta) void
+    +getATK() int
+    +getDEF() int
+    +setActIds(ids) void
+    +actIds() vector~string~
+    +actCount() int*
+  }
+
+  class Normal {
+    +Normal(name, hpMax, atk, def, mercyGoal)
+    +actCount() int
+  }
+
+  class MiniBoss {
+    +MiniBoss(name, hpMax, atk, def, mercyGoal)
+    +actCount() int
+  }
+
+  class Boss {
+    +Boss(name, hpMax, atk, def, mercyGoal)
+    +actCount() int
+  }
+
+  class Item {
+    &lt;&lt;struct&gt;&gt;
+    +name : string
+    +type : ItemType
+    +value : int
+    +quantity : int
+  }
+
+  class ItemType {
+    &lt;&lt;enum&gt;&gt;
+    HEAL
+  }
+
+  class Inventory {
+    -items_ : vector~Item~
+    +addItem(it) void
+    +getItem(name) Item*
+    +useItem(name) bool
+    +items() vector~Item~
+  }
+
+  class ActAction {
+    &lt;&lt;struct&gt;&gt;
+    +id : string
+    +text : string
+    +mercyImpact : int
+  }
+
+  class BestiaryEntry {
+    &lt;&lt;struct&gt;&gt;
+    +name : string
+    +category : string
+    +hpMax : int
+    +atk : int
+    +def : int
+    +spared : bool
+  }
+
+  class Bestiary {
+    -entries_ : vector~BestiaryEntry~
+    +add(e) void
+    +entries() vector~BestiaryEntry~
+  }
+
+  class MonsterCategory {
+    &lt;&lt;enum&gt;&gt;
+    NORMAL
+    MINIBOSS
+    BOSS
+  }
+
+  class FileLoader {
+    &lt;&lt;namespace&gt;&gt;
+    +loadItems(path, out) bool$
+    +loadMonsters(path, out) bool$
+  }
+
+  class Game {
+    -player_ : unique_ptr~Player~
+    -bestiary_ : Bestiary
+    -monsters_ : vector~Monster*~
+    -gameOver_ : bool
+    +loadData(itemsFile, monstersFile) bool
+    +run() void
+    +startCombat() void
+    +getPlayer() Player*
+    +getBestiary() Bestiary
+    -showSummary() void
+    -checkEnding() void
+  }
+
+  Entity <|-- Player : hérite
+  Entity <|-- Monster : hérite
+  Monster <|-- Normal : hérite
+  Monster <|-- MiniBoss : hérite
+  Monster <|-- Boss : hérite
+
+  Player *-- Inventory : possède
+  Inventory *-- Item : contient
+  Item --> ItemType : utilise
+  Monster --> MonsterCategory : utilise
+  Bestiary *-- BestiaryEntry : contient
+
+  Game *-- Player : possède
+  Game *-- Bestiary : possède
+  Game o-- Monster : référence
+  Game ..> FileLoader : utilise
+  Game ..> ActAction : utilise
+  </div>
+</div>
+
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Crimson Pro", Georgia, serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: 'Georgia, serif',
+    primaryColor: dark ? '#1e2438' : '#eeedfe',
+    primaryTextColor: dark ? '#c2c0b6' : '#26215c',
+    primaryBorderColor: dark ? '#3a4470' : '#534ab7',
+    lineColor: dark ? '#5f5e5a' : '#73726c',
+    secondaryColor: dark ? '#181d2a' : '#e1f5ee',
+    tertiaryColor: dark ? '#2a1e0a' : '#faeeda',
+    noteBkgColor: dark ? '#1e2438' : '#eeedfe',
+    noteTextColor: dark ? '#c2c0b6' : '#26215c',
+    classBorder: dark ? '#3a4470' : '#534ab7',
+    classText: dark ? '#d4cfc4' : '#26215c',
+    background: dark ? '#0a0c10' : '#ffffff',
+    mainBkg: dark ? '#1e2438' : '#eeedfe',
+    nodeBorder: dark ? '#3a4470' : '#534ab7',
+    clusterBkg: dark ? '#111520' : '#f5f4fe',
+    titleColor: dark ? '#e8c97a' : '#3c3489',
+    edgeLabelBackground: dark ? '#111520' : '#ffffff',
+    activeTaskBkgColor: dark ? '#1e2438' : '#eeedfe',
+  },
+  classDiagram: {
+    defaultRenderer: 'dagre',
+  }
+});
+
+const el = document.getElementById('uml-diagram');
+const src = el.textContent;
+const { svg } = await mermaid.render('uml-svg', src);
+el.innerHTML = svg;
+
+const svgEl = el.querySelector('svg');
+if (svgEl) {
+  svgEl.style.width = '100%';
+  svgEl.style.maxWidth = '100%';
+  svgEl.style.height = 'auto';
+}
+</script>

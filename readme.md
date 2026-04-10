@@ -64,6 +64,24 @@ Remarques :
 - Lancez l'exécutable depuis la racine du projet afin que les fichiers `data/items.csv` et `data/monsters.csv` soient trouvés par `main`.
 - Sous PowerShell, si vous avez des caractères box-drawing/UTF-8 illisibles, exécutez `chcp 65001` avant de lancer le jeu pour forcer l'encodage UTF-8.
 
+Option C — Interface graphique avec Qt (QML)
+
+```bash
+# Prérequis : Qt6 (Qt Quick) et CMake installés. Sur Windows, installez Qt via l'installateur officiel
+# Depuis la racine du projet :
+cd gui
+mkdir -p build
+cd build
+# Générer les fichiers de build (exemple MinGW)
+cmake -G "MinGW Makefiles" ..
+# Compiler
+cmake --build . --config Release
+# L'exécutable produit : build/alterdune_qt (ou alterdune_qt.exe sous Windows)
+./alterdune_qt
+```
+
+Remarque : l'application Qt Quick fournie dans `gui/` est un squelette QML minimal prêt à être intégré au moteur `Game`. Si vous souhaitez que j'intègre la logique C++ existante (`Game`, `FileLoader`, etc.) et l'expose à QML (boutons, vues de combat, bestiaire, inventaire), je peux le faire ensuite.
+
 Pour repartir de zéro (supprimer les fichiers compilés) :
 ```bash
 # Avec Makefile

@@ -2,6 +2,9 @@
 #include <random>
 #include <algorithm>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 
 #include "../../include/FileLoader.h"
 #include "../../include/ActAction.h"
@@ -12,16 +15,48 @@
 GameBridge::GameBridge(QObject *parent) : QObject(parent) {}
 
 bool GameBridge::loadData(const QString &itemsPath, const QString &monstersPath) {
-    std::string ip = itemsPath.toStdString();
-    std::string mp = monstersPath.toStdString();
+    auto resolveCandidates = [&](const QString &p) {
+        QStringList candidates;
+        candidates << p;
+        // path relative to application dir
+        QString appDir = QCoreApplication::applicationDirPath();
+        candidates << QDir(appDir).filePath(p);
+        // try parent directories (up to two levels)
+        candidates << QDir(appDir).filePath(QString("../") + p);
+        candidates << QDir(appDir).filePath(QString("../../") + p);
+        // also try CWD
+        candidates << QDir::current().filePath(p);
+        // normalize
+        for (auto &c : candidates) c = QDir::cleanPath(c);
+        return candidates;
+    };
+
+    auto pickExisting = [&](const QString &p) -> QString {
+        QStringList cand = resolveCandidates(p);
+        for (const QString &c : cand) {
+            if (QFileInfo::exists(c)) return c;
+        }
+        return QString();
+    };
+
+    QString ipath = pickExisting(itemsPath);
+    if (ipath.isEmpty()) ipath = itemsPath; // fallback to provided
+    QString mpath = pickExisting(monstersPath);
+    if (mpath.isEmpty()) mpath = monstersPath;
+
+    emit logMessage(QString("Chargement items depuis: %1").arg(ipath));
+    emit logMessage(QString("Chargement monsters depuis: %1").arg(mpath));
+
+    std::string ip = ipath.toStdString();
+    std::string mp = mpath.toStdString();
     std::vector<Item> items;
     if (!FileLoader::loadItems(ip, items)) {
-        emit logMessage(QString::fromUtf8("Erreur: impossible de charger items depuis %1").arg(itemsPath));
+        emit logMessage(QString::fromUtf8("Erreur: impossible de charger items depuis %1").arg(ipath));
         return false;
     }
     std::vector<std::unique_ptr<Monster>> mons;
     if (!FileLoader::loadMonsters(mp, mons)) {
-        emit logMessage(QString::fromUtf8("Erreur: impossible de charger monsters depuis %1").arg(monstersPath));
+        emit logMessage(QString::fromUtf8("Erreur: impossible de charger monsters depuis %1").arg(mpath));
         return false;
     }
 

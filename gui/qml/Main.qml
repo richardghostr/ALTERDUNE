@@ -121,7 +121,14 @@ ApplicationWindow {
                     maximumLength: 20
                     font.pixelSize: 16; color: root.cText
                     background: Rectangle { color: root.cBg4; border.color: nameField.activeFocus ? root.cGold : root.cBorder; border.width: 1; radius: 6 }
-                    Keys.onReturnPressed: startBtn.clicked()
+                    Keys.onReturnPressed: {
+                        var n = nameField.text.trim()
+                        if (n.length === 0) n = "Aventurier"
+                        if (GameBridge) GameBridge.newGame(n)
+                        root.dataLoaded = true
+                        root.showNameDialog = false
+                        root.addLog("Bienvenue, " + n + " !", root.cGold2)
+                    }
                     Component.onCompleted: forceActiveFocus()
                 }
                 Rectangle {

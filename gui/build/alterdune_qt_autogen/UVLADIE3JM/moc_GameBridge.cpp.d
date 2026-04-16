@@ -129,6 +129,7 @@ C:/Users/richa/ALTERDUNE/gui/build/alterdune_qt_autogen/UVLADIE3JM/moc_GameBridg
   C:/Users/richa/ALTERDUNE/include/Entity.h \
   C:/Users/richa/ALTERDUNE/include/Inventory.h \
   C:/Users/richa/ALTERDUNE/include/Item.h \
+  C:/Users/richa/ALTERDUNE/include/Monster.h \
   C:/Users/richa/ALTERDUNE/include/Player.h \
   C:/msys64/mingw64/include/_mingw.h \
   C:/msys64/mingw64/include/_mingw_mac.h \
@@ -186,6 +187,8 @@ C:/Users/richa/ALTERDUNE/gui/build/alterdune_qt_autogen/UVLADIE3JM/moc_GameBridg
   C:/msys64/mingw64/include/c++/15.2.0/bits/postypes.h \
   C:/msys64/mingw64/include/c++/15.2.0/bits/predefined_ops.h \
   C:/msys64/mingw64/include/c++/15.2.0/bits/ptr_traits.h \
+  C:/msys64/mingw64/include/c++/15.2.0/bits/random.h \
+  C:/msys64/mingw64/include/c++/15.2.0/bits/random.tcc \
   C:/msys64/mingw64/include/c++/15.2.0/bits/range_access.h \
   C:/msys64/mingw64/include/c++/15.2.0/bits/refwrap.h \
   C:/msys64/mingw64/include/c++/15.2.0/bits/requires_hosted.h \
@@ -270,6 +273,7 @@ C:/Users/richa/ALTERDUNE/gui/build/alterdune_qt_autogen/UVLADIE3JM/moc_GameBridg
   C:/msys64/mingw64/include/c++/15.2.0/pstl/execution_defs.h \
   C:/msys64/mingw64/include/c++/15.2.0/pstl/glue_numeric_defs.h \
   C:/msys64/mingw64/include/c++/15.2.0/pstl/pstl_config.h \
+  C:/msys64/mingw64/include/c++/15.2.0/random \
   C:/msys64/mingw64/include/c++/15.2.0/ratio \
   C:/msys64/mingw64/include/c++/15.2.0/set \
   C:/msys64/mingw64/include/c++/15.2.0/stdexcept \
@@ -307,6 +311,7 @@ C:/Users/richa/ALTERDUNE/gui/build/alterdune_qt_autogen/UVLADIE3JM/moc_GameBridg
   C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
   C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
   C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h \
   C:/msys64/mingw64/include/corecrt.h \
   C:/msys64/mingw64/include/corecrt_startup.h \
@@ -339,9 +344,15 @@ C:/Users/richa/ALTERDUNE/gui/build/alterdune_qt_autogen/UVLADIE3JM/moc_GameBridg
   C:/msys64/mingw64/include/time.h \
   C:/msys64/mingw64/include/vadefs.h \
   C:/msys64/mingw64/include/wchar.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/emmintrin.h \
   C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/limits.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mwaitintrin.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pmmintrin.h \
   C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdarg.h \
   C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdbool.h \
   C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
   C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
-  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h \
+  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h

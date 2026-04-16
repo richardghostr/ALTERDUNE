@@ -350,11 +350,21 @@ CMakeFiles/alterdune_qt.dir/alterdune_qt_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qalloc.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/q23utility.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/q20utility.h \
+ C:/msys64/mingw64/include/c++/15.2.0/random \
+ C:/msys64/mingw64/include/c++/15.2.0/bits/random.h \
+ C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pmmintrin.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/emmintrin.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mwaitintrin.h \
+ C:/msys64/mingw64/include/c++/15.2.0/bits/random.tcc \
  C:/Users/richa/ALTERDUNE/include/Player.h \
  C:/Users/richa/ALTERDUNE/include/Entity.h \
  C:/Users/richa/ALTERDUNE/include/Item.h \
  C:/Users/richa/ALTERDUNE/include/Inventory.h \
  C:/Users/richa/ALTERDUNE/include/Bestiary.h \
+ C:/Users/richa/ALTERDUNE/include/Monster.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qtmochelpers.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qtmocconstants.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/q20algorithm.h

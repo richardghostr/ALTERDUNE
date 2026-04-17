@@ -115,8 +115,8 @@ ApplicationWindow {
                 anchors.fill: parent; anchors.margins: 40; spacing: 22
 
                 Column { Layout.alignment: Qt.AlignHCenter; spacing: 6
-                    Text { text: "ALTERDUNE"; font.family: "Georgia"; font.pixelSize: 34; color: root.cGold2; anchors.horizontalCenter: parent.horizontalCenter }
-                    Text { text: "Un RPG de la parole et de l'epee"; font.pixelSize: 12; color: root.cText3; anchors.horizontalCenter: parent.horizontalCenter }
+                    Text { text: "ALTERDUNE"; font.family: "Georgia"; font.pixelSize: 34; font.font.letterSpacing: 6; color: root.cGold2; anchors.horizontalCenter: parent.horizontalCenter }
+                    Text { text: "Un RPG de la parole et de l'epee"; font.pixelSize: 12; color: root.cText3; font.letterSpacing: 2; anchors.horizontalCenter: parent.horizontalCenter }
                 }
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: root.cBorder }
@@ -178,7 +178,7 @@ ApplicationWindow {
                     text: { var t = GameBridge.endingType(); return t==="genocide"?"☠":t==="pacifist"?"☮":t==="death"?"†":"⚖" }
                     color: { var t = GameBridge.endingType(); return t==="genocide"||t==="death"?root.cRedLt:t==="pacifist"?root.cTealLt:root.cGold2 }
                 }
-                Text { Layout.alignment: Qt.AlignHCenter; text: GameBridge.endingTitle(); font.family: "Georgia"; font.pixelSize: 24; color: root.cGold2 }
+                Text { Layout.alignment: Qt.AlignHCenter; text: GameBridge.endingTitle(); font.family: "Georgia"; font.pixelSize: 24; font.font.letterSpacing: 3; color: root.cGold2 }
                 Text { Layout.alignment: Qt.AlignHCenter; Layout.fillWidth: true; text: GameBridge.endingText(); font.pixelSize: 13; color: root.cText2; font.italic: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter }
 
                 RowLayout { Layout.alignment: Qt.AlignHCenter; spacing: 28
@@ -246,7 +246,7 @@ ApplicationWindow {
 
                 // Logo
                 Column { Layout.fillWidth: true; spacing:4; bottomPadding:14
-                    Text { text:"ALTERDUNE"; font.family:"Georgia"; font.pixelSize:17; color:root.cGold2; anchors.horizontalCenter:parent.horizontalCenter }
+                    Text { text:"ALTERDUNE"; font.family:"Georgia"; font.pixelSize:17; font.font.letterSpacing:4; color:root.cGold2; anchors.horizontalCenter:parent.horizontalCenter }
                     Rectangle { width:parent.width; height:1; color:root.cBorder }
                 }
 
@@ -353,7 +353,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout { anchors.fill:parent; anchors.margins:24; spacing:14
-                        Text { text:"Tableau de bord"; font.family:"Georgia"; font.pixelSize:21; color:root.cGold2 }
+                        Text { text:"Tableau de bord"; font.family:"Georgia"; font.pixelSize:21; font.font.letterSpacing:1; color:root.cGold2 }
                         Rectangle { Layout.fillWidth:true; height:1; color:root.cBorder }
 
                         GridLayout { columns:4; Layout.fillWidth:true; columnSpacing:12; rowSpacing:12
@@ -410,7 +410,7 @@ ApplicationWindow {
                         }
 
                         // Journal
-                        Text { text:"Journal de partie"; font.pixelSize:12; color:root.cText3 }
+                        Text { text:"Journal de partie"; font.pixelSize:12; color:root.cText3; font.letterSpacing:1 }
                         Rectangle { Layout.fillWidth:true; Layout.fillHeight:true; color:root.cBg2; border.color:root.cBorder; border.width:1; radius:8; clip:true
                             ListView { id:homeLogView; anchors.fill:parent; anchors.margins:12; model:logModel; spacing:2
                                 delegate: Text { width:parent?parent.width:0; text:model.txt; color:model.col; font.pixelSize:12; font.italic:true; wrapMode:Text.Wrap }
@@ -438,7 +438,7 @@ ApplicationWindow {
                                         Item { Layout.fillWidth:true }
                                         Rectangle {
                                             visible: root.showDmgFlash && root.flashIsPlayer && root.flashAmount>0
-                                            color:"#40e74c3c"; radius:4; padding:4
+                                            color:"#40e74c3c"; radius:4
                                             Text { text:"-"+root.flashAmount; color:root.cRedLt; font.pixelSize:14; font.bold:true }
                                         }
                                     }
@@ -479,12 +479,12 @@ ApplicationWindow {
                                     RowLayout {
                                         Text { text:GameBridge.enemyName||"—"; font.family:"Georgia"; font.pixelSize:16; color:root.cRedLt }
                                         Rectangle { visible:GameBridge.enemyName!==""; width:catLbl.implicitWidth+12; height:18; radius:9; color:root.catBg(GameBridge.enemyCategory)
-                                            Text{id:catLbl;anchors.centerIn:parent;text:GameBridge.enemyCategory;font.pixelSize:9;color:root.catCol(GameBridge.enemyCategory)}
+                                            Text{id:catLbl;anchors.centerIn:parent;text:GameBridge.enemyCategory;font.pixelSize:9;font.letterSpacing:1;color:root.catCol(GameBridge.enemyCategory)}
                                         }
                                         Item { Layout.fillWidth:true }
                                         Rectangle {
                                             visible: root.showDmgFlash && !root.flashIsPlayer && root.flashAmount>0
-                                            color:"#4025b09e"; radius:4; padding:4
+                                            color:"#4025b09e"; radius:4
                                             Text { text:"-"+root.flashAmount; color:root.cTealLt; font.pixelSize:14; font.bold:true }
                                         }
                                     }
@@ -564,7 +564,7 @@ ApplicationWindow {
                                                 width:30;height:14;radius:7;color:root.cPurLt
                                                 Text{anchors.centerIn:parent;text:"OK";font.pixelSize:8;font.bold:true;color:"#1a0d2e"}
                                             }
-                                            Text{anchors.centerIn:parent;text:modelData.l;color:modelData.tc;font.family:"Georgia";font.pixelSize:14;font.bold:true}
+                                            Text{anchors.centerIn:parent;text:modelData.l;color:modelData.tc;font.family:"Georgia";font.pixelSize:14;font.bold:true;font.font.letterSpacing:1}
                                             HoverHandler{id:bh}
                                             TapHandler{onTapped:{
                                                 if(modelData.a==="fight")      { root.subMode=""; GameBridge.playerFight() }
@@ -580,7 +580,7 @@ ApplicationWindow {
                                     Layout.fillWidth:true; color:root.cBg3; border.color:root.cTeal; border.width:1; radius:10
                                     height: actSubCol.implicitHeight+20
                                     ColumnLayout { id:actSubCol; anchors.fill:parent; anchors.margins:14; spacing:8
-                                        Text { text:"Choisir une action ACT"; font.pixelSize:11; color:root.cTealLt }
+                                        Text { text:"Choisir une action ACT"; font.pixelSize:11; color:root.cTealLt; font.letterSpacing:1 }
                                         GridLayout { columns:2; Layout.fillWidth:true; columnSpacing:8; rowSpacing:8
                                             Repeater { model: GameBridge.enemyActs()
                                                 delegate: Rectangle { Layout.fillWidth:true; height:54; radius:8
@@ -608,7 +608,7 @@ ApplicationWindow {
                                     Layout.fillWidth:true; color:root.cBg3; border.color:"#633806"; border.width:1; radius:10
                                     height: itemSubCol.implicitHeight+20
                                     ColumnLayout { id:itemSubCol; anchors.fill:parent; anchors.margins:14; spacing:8
-                                        Text{text:"Utiliser un item";font.pixelSize:11;color:"#fac775"}
+                                        Text{text:"Utiliser un item";font.pixelSize:11;color:"#fac775";font.letterSpacing:1}
                                         GridLayout{columns:3;Layout.fillWidth:true;columnSpacing:8;rowSpacing:8
                                             Repeater{model:GameBridge.inventory()
                                                 delegate:Rectangle{Layout.fillWidth:true;height:52;radius:8
@@ -636,7 +636,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Bestiaire";font.family:"Georgia";font.pixelSize:21;color:root.cGold2}
+                        Text{text:"Bestiaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         RowLayout {
                             Text { text:GameBridge.bestiaryEntries().length+" monstre(s) vaincu(s)"; font.pixelSize:12; color:root.cText3; font.italic:true }
@@ -649,7 +649,7 @@ ApplicationWindow {
                                     RowLayout{
                                         Text{text:modelData.name;font.family:"Georgia";font.pixelSize:14;color:root.cText;Layout.fillWidth:true}
                                         Rectangle{width:cLbl.implicitWidth+12;height:18;radius:9;color:root.catBg(modelData.category)
-                                            Text{id:cLbl;anchors.centerIn:parent;text:modelData.category;font.pixelSize:9;color:root.catCol(modelData.category)}
+                                            Text{id:cLbl;anchors.centerIn:parent;text:modelData.category;font.pixelSize:9;font.letterSpacing:1;color:root.catCol(modelData.category)}
                                         }
                                     }
                                     RowLayout{spacing:16
@@ -671,7 +671,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Inventaire";font.family:"Georgia";font.pixelSize:21;color:root.cGold2}
+                        Text{text:"Inventaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         Text{text:"Utilisez vos objets ici (hors combat) ou cliquez dessus pendant le combat.";font.pixelSize:12;color:root.cText3;font.italic:true;wrapMode:Text.Wrap;Layout.fillWidth:true}
 
@@ -707,7 +707,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Statistiques";font.family:"Georgia";font.pixelSize:21;color:root.cGold2}
+                        Text{text:"Statistiques";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
 
                         GridLayout{columns:2;Layout.fillWidth:true;columnSpacing:12;rowSpacing:12
@@ -742,7 +742,7 @@ ApplicationWindow {
 
                         Rectangle{Layout.fillWidth:true;height:82;color:root.cBg3;border.color:root.cBorder;border.width:1;radius:12
                             ColumnLayout{anchors.fill:parent;anchors.margins:14;spacing:6
-                                Text{text:"FIN PROBABLE";font.pixelSize:10;color:root.cGold;font.bold:true}
+                                Text{text:"FIN PROBABLE";font.pixelSize:10;color:root.cGold;font.letterSpacing:2;font.bold:true}
                                 Text{font.pixelSize:14;color:root.cText2;font.italic:true
                                     text:{
                                         var k=GameBridge.playerKills,s=GameBridge.playerSpares,v=k+s
@@ -763,7 +763,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Choisir un adversaire";font.family:"Georgia";font.pixelSize:21;color:root.cGold2}
+                        Text{text:"Choisir un adversaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         Text{text:"Cliquez sur un monstre pour lancer le combat directement contre lui.";font.pixelSize:12;color:root.cText3;font.italic:true}
 
@@ -780,7 +780,7 @@ ApplicationWindow {
                                     RowLayout{
                                         Text{text:modelData.name;font.family:"Georgia";font.pixelSize:16;color:root.cText;Layout.fillWidth:true}
                                         Rectangle{width:mCat.implicitWidth+12;height:20;radius:10;color:root.catBg(modelData.category)
-                                            Text{id:mCat;anchors.centerIn:parent;text:modelData.category;font.pixelSize:10;color:root.catCol(modelData.category)}
+                                            Text{id:mCat;anchors.centerIn:parent;text:modelData.category;font.pixelSize:10;font.letterSpacing:1;color:root.catCol(modelData.category)}
                                         }
                                     }
                                     RowLayout{spacing:20

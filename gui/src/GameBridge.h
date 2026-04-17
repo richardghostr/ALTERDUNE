@@ -10,7 +10,6 @@
 #include "../../include/Bestiary.h"
 #include "../../include/Monster.h"
 
-
 class GameBridge : public QObject {
     Q_OBJECT
 

@@ -30,6 +30,10 @@ class GameBridge : public QObject {
     Q_PROPERTY(bool     dataReady     READ dataReady     NOTIFY stateChanged)
     Q_PROPERTY(int      lastDmgPlayer READ lastDmgPlayer NOTIFY stateChanged)
     Q_PROPERTY(int      lastDmgEnemy  READ lastDmgEnemy  NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList inventory      READ inventory      NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList enemyActs      READ enemyActs      NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList bestiaryEntries READ bestiaryEntries NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList monsterPool    READ monsterPool    NOTIFY stateChanged)
 
 public:
     explicit GameBridge(QObject *parent = nullptr);

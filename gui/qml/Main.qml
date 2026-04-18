@@ -456,7 +456,7 @@ ApplicationWindow {
                                     }
                                     // items rapides
                                     RowLayout { spacing:6
-                                        Repeater { model: GameBridge.inventory()
+                                        Repeater { model: GameBridge.inventory
                                             delegate: Rectangle {
                                                 visible: modelData.qty>0; height:24
                                                 width: itmLbl.implicitWidth+16; radius:4
@@ -581,7 +581,7 @@ ApplicationWindow {
                                     ColumnLayout { id:actSubCol; anchors.fill:parent; anchors.margins:14; spacing:8
                                         Text { text:"Choisir une action ACT"; font.pixelSize:11; color:root.cTealLt; font.letterSpacing:1 }
                                         GridLayout { columns:2; Layout.fillWidth:true; columnSpacing:8; rowSpacing:8
-                                            Repeater { model: GameBridge.enemyActs()
+                                            Repeater { model: GameBridge.enemyActs
                                                 delegate: Rectangle { Layout.fillWidth:true; height:54; radius:8
                                                     color:ah.containsMouse?root.cBg4:root.cBg2; border.color:root.cBorder; border.width:1
                                                     Behavior on color{ColorAnimation{duration:80}}
@@ -609,7 +609,7 @@ ApplicationWindow {
                                     ColumnLayout { id:itemSubCol; anchors.fill:parent; anchors.margins:14; spacing:8
                                         Text{text:"Utiliser un item";font.pixelSize:11;color:"#fac775";font.letterSpacing:1}
                                         GridLayout{columns:3;Layout.fillWidth:true;columnSpacing:8;rowSpacing:8
-                                            Repeater{model:GameBridge.inventory()
+                                            Repeater{model:GameBridge.inventory
                                                 delegate:Rectangle{Layout.fillWidth:true;height:52;radius:8
                                                     color:modelData.qty>0?(ih.containsMouse?root.cBg4:root.cBg2):root.cBg
                                                     border.color:modelData.qty>0?root.cBorder:"#1e1e1e";border.width:1;opacity:modelData.qty>0?1:0.38
@@ -639,19 +639,19 @@ ApplicationWindow {
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         RowLayout {
                             Text {
-                                text: GameBridge.bestiaryEntries().length + " monstre(s) vaincu(s)"
+                                text: GameBridge.bestiaryEntries.length + " monstre(s) vaincu(s)"
                                 font.pixelSize: 12; color: root.cText3; font.italic: true
                             }
                         }
                         Text {
-                            visible: GameBridge.bestiaryEntries().length === 0
+                            visible: GameBridge.bestiaryEntries.length === 0
                             text: "Aucun monstre vaincu.\nCommencez un combat !"
                             color: root.cText3; font.italic: true; font.pixelSize: 14
                             Layout.alignment: Qt.AlignHCenter; topPadding: 60
                             horizontalAlignment: Text.AlignHCenter
                         }
                         GridView{id:bestGrid;Layout.fillWidth:true;Layout.fillHeight:true;cellWidth:230;cellHeight:135;clip:true
-                            model:GameBridge.bestiaryEntries()
+                            model:GameBridge.bestiaryEntries
                             delegate:Rectangle{width:220;height:122;color:root.cBg3;border.color:modelData.spared?root.cTeal:root.cBorder;border.width:modelData.spared?1:1;radius:10
                                 ColumnLayout{anchors.fill:parent;anchors.margins:13;spacing:5
                                     RowLayout{
@@ -683,7 +683,7 @@ ApplicationWindow {
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         Text{text:"Utilisez vos objets ici (hors combat) ou cliquez dessus pendant le combat.";font.pixelSize:12;color:root.cText3;font.italic:true;wrapMode:Text.Wrap;Layout.fillWidth:true}
 
-                        Repeater{model:GameBridge.inventory()
+                        Repeater{model:GameBridge.inventory
                             delegate:Rectangle{Layout.fillWidth:true;height:70;color:root.cBg3;border.color:root.cBorder;border.width:1;radius:12
                                 RowLayout{anchors.fill:parent;anchors.margins:18;spacing:16
                                     Rectangle{width:44;height:44;radius:8;color:"#1a1400";border.color:"#633806";border.width:1
@@ -776,7 +776,7 @@ ApplicationWindow {
                         Text{text:"Cliquez sur un monstre pour lancer le combat directement contre lui.";font.pixelSize:12;color:root.cText3;font.italic:true}
 
                         GridView{Layout.fillWidth:true;Layout.fillHeight:true;cellWidth:280;cellHeight:160;clip:true
-                            model: GameBridge.monsterPool()
+                            model: GameBridge.monsterPool
                             delegate: Rectangle { width:268;height:148
                                 color:mh.containsMouse?root.cBg4:root.cBg3
                                 border.color:mh.containsMouse?root.catCol(modelData.category):root.cBorder

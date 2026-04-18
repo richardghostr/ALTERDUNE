@@ -1,6 +1,9 @@
 #include "GameBridge.h"
 #include <algorithm>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 
 #include "../../include/FileLoader.h"
 #include "../../include/ActAction.h"
@@ -29,14 +32,42 @@ QString GameBridge::categoryStr(MonsterCategory c) const {
 // Data loading
 // ─────────────────────────────────────────────────────────────────
 bool GameBridge::loadData(const QString &itemsPath, const QString &monstersPath) {
+    // Resolve candidate paths for items and monsters and log attempts
+    auto findExisting = [&](const QString &p) -> QString {
+        QStringList candidates;
+        candidates << p;
+        QString appDir = QCoreApplication::applicationDirPath();
+        candidates << QDir(appDir).filePath(p);
+        candidates << QDir(appDir).filePath(QDir::cleanPath("../" + p));
+        candidates << QDir::current().filePath(p);
+        candidates << QDir::current().filePath(QDir::cleanPath("../" + p));
+        for (const QString &c : candidates) {
+            emit logMessage(QString("Tentative de chargement depuis: %1").arg(c), "system");
+            if (QFileInfo::exists(c)) return c;
+        }
+        return QString();
+    };
+
+    QString itemsResolved = findExisting(itemsPath);
+    if (itemsResolved.isEmpty()) {
+        emit logMessage(QString("Erreur: items non trouves (tentatives: %1, %2)").arg(itemsPath).arg(QCoreApplication::applicationDirPath()), "error");
+        return false;
+    }
+
+    QString monstersResolved = findExisting(monstersPath);
+    if (monstersResolved.isEmpty()) {
+        emit logMessage(QString("Erreur: monsters non trouves (tentatives: %1, %2)").arg(monstersPath).arg(QCoreApplication::applicationDirPath()), "error");
+        return false;
+    }
+
     std::vector<Item> items;
-    if (!FileLoader::loadItems(itemsPath.toStdString(), items)) {
-        emit logMessage(QString("Erreur: impossible de charger %1").arg(itemsPath), "error");
+    if (!FileLoader::loadItems(itemsResolved.toStdString(), items)) {
+        emit logMessage(QString("Erreur: impossible de charger %1").arg(itemsResolved), "error");
         return false;
     }
     std::vector<std::unique_ptr<Monster>> mons;
-    if (!FileLoader::loadMonsters(monstersPath.toStdString(), mons)) {
-        emit logMessage(QString("Erreur: impossible de charger %1").arg(monstersPath), "error");
+    if (!FileLoader::loadMonsters(monstersResolved.toStdString(), mons)) {
+        emit logMessage(QString("Erreur: impossible de charger %1").arg(monstersResolved), "error");
         return false;
     }
     monstersPool_.clear();

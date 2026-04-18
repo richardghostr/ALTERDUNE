@@ -90,6 +90,7 @@ private:
     Bestiary                              bestiary_;
     std::vector<std::shared_ptr<Monster>> monstersPool_;
     std::shared_ptr<Monster>              enemy_;
+    std::vector<Item>                     initialItems_;
     bool                                  dataReady_     { false };
     int                                   lastDmgPlayer_ { 0 };
     int                                   lastDmgEnemy_  { 0 };

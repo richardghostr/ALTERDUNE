@@ -78,6 +78,13 @@ ApplicationWindow {
 
     ListModel { id: logModel }
 
+    function doStart() {
+        var n = nameField.text.trim() !== "" ? nameField.text.trim() : "Aventurier"
+        GameBridge.newGame(n)
+        root.showName = false
+        root.log("Bienvenue, " + n + " ! Votre aventure commence.", "system")
+    }
+
     Component.onCompleted: {
         GameBridge.loadData("../data/items.csv", "../data/monsters.csv")
     }
@@ -115,7 +122,7 @@ ApplicationWindow {
                 anchors.fill: parent; anchors.margins: 40; spacing: 22
 
                 Column { Layout.alignment: Qt.AlignHCenter; spacing: 6
-                    Text { text: "ALTERDUNE"; font.family: "Georgia"; font.pixelSize: 34; font.font.letterSpacing: 6; color: root.cGold2; anchors.horizontalCenter: parent.horizontalCenter }
+                    Text { text: "ALTERDUNE"; font.family: "Georgia"; font.pixelSize: 34; font.letterSpacing: 6; color: root.cGold2; anchors.horizontalCenter: parent.horizontalCenter }
                     Text { text: "Un RPG de la parole et de l'epee"; font.pixelSize: 12; color: root.cText3; font.letterSpacing: 2; anchors.horizontalCenter: parent.horizontalCenter }
                 }
 
@@ -151,12 +158,6 @@ ApplicationWindow {
             }
         }
 
-        function doStart() {
-            var n = nameField.text.trim() || "Aventurier"
-            GameBridge.newGame(n)
-            root.showName = false
-            root.log("Bienvenue, " + n + " ! Votre aventure commence.", "system")
-        }
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -175,18 +176,18 @@ ApplicationWindow {
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter; font.pixelSize: 56
-                    text: { var t = GameBridge.endingType(); return t==="genocide"?"☠":t==="pacifist"?"☮":t==="death"?"†":"⚖" }
-                    color: { var t = GameBridge.endingType(); return t==="genocide"||t==="death"?root.cRedLt:t==="pacifist"?root.cTealLt:root.cGold2 }
+                    text: { if (!root.showEnding) return "⚖"; var t = GameBridge.endingType(); return t==="genocide"?"☠":t==="pacifist"?"☮":t==="death"?"†":"⚖" }
+                    color: { if (!root.showEnding) return root.cGold2; var t = GameBridge.endingType(); return t==="genocide"||t==="death"?root.cRedLt:t==="pacifist"?root.cTealLt:root.cGold2 }
                 }
-                Text { Layout.alignment: Qt.AlignHCenter; text: GameBridge.endingTitle(); font.family: "Georgia"; font.pixelSize: 24; font.font.letterSpacing: 3; color: root.cGold2 }
-                Text { Layout.alignment: Qt.AlignHCenter; Layout.fillWidth: true; text: GameBridge.endingText(); font.pixelSize: 13; color: root.cText2; font.italic: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter }
+                Text { Layout.alignment: Qt.AlignHCenter; text: root.showEnding ? GameBridge.endingTitle() : ""; font.family: "Georgia"; font.pixelSize: 24; font.letterSpacing: 3; color: root.cGold2 }
+                Text { Layout.alignment: Qt.AlignHCenter; Layout.fillWidth: true; text: root.showEnding ? GameBridge.endingText() : ""; font.pixelSize: 13; color: root.cText2; font.italic: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter }
 
                 RowLayout { Layout.alignment: Qt.AlignHCenter; spacing: 28
                     Repeater {
                         model: [
-                            { l: "Tues",     v: GameBridge.playerKills() },
-                            { l: "Epargnes", v: GameBridge.playerSpares() },
-                            { l: "Victoires",v: GameBridge.victories() }
+                            { l: "Tues",     v: GameBridge.playerKills },
+                            { l: "Epargnes", v: GameBridge.playerSpares },
+                            { l: "Victoires",v: GameBridge.victories }
                         ]
                         delegate: Rectangle { width: 96; height: 72; color: root.cBg4; border.color: root.cBorder; border.width:1; radius:10
                             Column { anchors.centerIn: parent; spacing:4
@@ -246,7 +247,7 @@ ApplicationWindow {
 
                 // Logo
                 Column { Layout.fillWidth: true; spacing:4; bottomPadding:14
-                    Text { text:"ALTERDUNE"; font.family:"Georgia"; font.pixelSize:17; font.font.letterSpacing:4; color:root.cGold2; anchors.horizontalCenter:parent.horizontalCenter }
+                    Text { text:"ALTERDUNE"; font.family:"Georgia"; font.pixelSize:17; font.letterSpacing:4; color:root.cGold2; anchors.horizontalCenter:parent.horizontalCenter }
                     Rectangle { width:parent.width; height:1; color:root.cBorder }
                 }
 
@@ -254,7 +255,7 @@ ApplicationWindow {
                 Repeater {
                     model: [
                         { label:"Accueil",      icon:"◈", page:0 },
-                        { label:"Combat",       icon:"⚔", page:1, badge: GameBridge.inCombat },
+                        { label:"Combat",       icon:"⚔", page:1 },
                         { label:"Choisir monstre", icon:"◎", page:5 },
                         { label:"Bestiaire",    icon:"◉", page:2 },
                         { label:"Inventaire",   icon:"⬡", page:3 },
@@ -299,7 +300,7 @@ ApplicationWindow {
                     color:root.cBg3; border.color:root.cBorder; border.width:1; radius:10
 
                     ColumnLayout { anchors.fill:parent; anchors.margins:12; spacing:7
-                        Text { text:GameBridge.playerName||"—"; font.pixelSize:14; font.family:"Georgia"; color:root.cGold; elide:Text.ElideRight; Layout.fillWidth:true }
+                        Text { text:GameBridge.playerName !== "" ? GameBridge.playerName : "—"; font.pixelSize:14; font.family:"Georgia"; color:root.cGold; elide:Text.ElideRight; Layout.fillWidth:true }
 
                         Column { Layout.fillWidth:true; spacing:3
                             RowLayout {
@@ -353,7 +354,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout { anchors.fill:parent; anchors.margins:24; spacing:14
-                        Text { text:"Tableau de bord"; font.family:"Georgia"; font.pixelSize:21; font.font.letterSpacing:1; color:root.cGold2 }
+                        Text { text:"Tableau de bord"; font.family:"Georgia"; font.pixelSize:21; font.letterSpacing:1; color:root.cGold2 }
                         Rectangle { Layout.fillWidth:true; height:1; color:root.cBorder }
 
                         GridLayout { columns:4; Layout.fillWidth:true; columnSpacing:12; rowSpacing:12
@@ -434,12 +435,11 @@ ApplicationWindow {
                                 // Joueur
                                 ColumnLayout { Layout.fillWidth:true; spacing:5
                                     RowLayout {
-                                        Text { text:GameBridge.playerName||"Joueur"; font.family:"Georgia"; font.pixelSize:16; color:root.cTealLt }
+                                        Text { text:GameBridge.playerName !== "" ? GameBridge.playerName : "Joueur"; font.family:"Georgia"; font.pixelSize:16; color:root.cTealLt }
                                         Item { Layout.fillWidth:true }
-                                        Rectangle {
+                                        Text {
                                             visible: root.showDmgFlash && root.flashIsPlayer && root.flashAmount>0
-                                            color:"#40e74c3c"; radius:4
-                                            Text { text:"-"+root.flashAmount; color:root.cRedLt; font.pixelSize:14; font.bold:true }
+                                            text:"-"+root.flashAmount; color:root.cRedLt; font.pixelSize:14; font.bold:true
                                         }
                                     }
                                     RowLayout {
@@ -477,15 +477,14 @@ ApplicationWindow {
                                 // Ennemi
                                 ColumnLayout { Layout.fillWidth:true; spacing:5
                                     RowLayout {
-                                        Text { text:GameBridge.enemyName||"—"; font.family:"Georgia"; font.pixelSize:16; color:root.cRedLt }
+                                        Text { text:GameBridge.enemyName !== "" ? GameBridge.enemyName : "—"; font.family:"Georgia"; font.pixelSize:16; color:root.cRedLt }
                                         Rectangle { visible:GameBridge.enemyName!==""; width:catLbl.implicitWidth+12; height:18; radius:9; color:root.catBg(GameBridge.enemyCategory)
                                             Text{id:catLbl;anchors.centerIn:parent;text:GameBridge.enemyCategory;font.pixelSize:9;font.letterSpacing:1;color:root.catCol(GameBridge.enemyCategory)}
                                         }
                                         Item { Layout.fillWidth:true }
-                                        Rectangle {
+                                        Text {
                                             visible: root.showDmgFlash && !root.flashIsPlayer && root.flashAmount>0
-                                            color:"#4025b09e"; radius:4
-                                            Text { text:"-"+root.flashAmount; color:root.cTealLt; font.pixelSize:14; font.bold:true }
+                                            text:"-"+root.flashAmount; color:root.cTealLt; font.pixelSize:14; font.bold:true
                                         }
                                     }
                                     RowLayout {
@@ -564,7 +563,7 @@ ApplicationWindow {
                                                 width:30;height:14;radius:7;color:root.cPurLt
                                                 Text{anchors.centerIn:parent;text:"OK";font.pixelSize:8;font.bold:true;color:"#1a0d2e"}
                                             }
-                                            Text{anchors.centerIn:parent;text:modelData.l;color:modelData.tc;font.family:"Georgia";font.pixelSize:14;font.bold:true;font.font.letterSpacing:1}
+                                            Text{anchors.centerIn:parent;text:modelData.l;color:modelData.tc;font.family:"Georgia";font.pixelSize:14;font.bold:true;font.letterSpacing:1}
                                             HoverHandler{id:bh}
                                             TapHandler{onTapped:{
                                                 if(modelData.a==="fight")      { root.subMode=""; GameBridge.playerFight() }
@@ -636,12 +635,21 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Bestiaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
+                        Text{text:"Bestiaire";font.family:"Georgia";font.pixelSize:21;font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         RowLayout {
-                            Text { text:GameBridge.bestiaryEntries().length+" monstre(s) vaincu(s)"; font.pixelSize:12; color:root.cText3; font.italic:true }
+                            Text {
+                                text: GameBridge.bestiaryEntries().length + " monstre(s) vaincu(s)"
+                                font.pixelSize: 12; color: root.cText3; font.italic: true
+                            }
                         }
-                        Text{visible:GameBridge.bestiaryEntries().length===0;text:"Aucun monstre vaincu.\nCommencez un combat !";color:root.cText3;font.italic:true;font.pixelSize:14;Layout.alignment:Qt.AlignHCenter;topPadding:60;horizontalAlignment:Text.AlignHCenter}
+                        Text {
+                            visible: GameBridge.bestiaryEntries().length === 0
+                            text: "Aucun monstre vaincu.\nCommencez un combat !"
+                            color: root.cText3; font.italic: true; font.pixelSize: 14
+                            Layout.alignment: Qt.AlignHCenter; topPadding: 60
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                         GridView{id:bestGrid;Layout.fillWidth:true;Layout.fillHeight:true;cellWidth:230;cellHeight:135;clip:true
                             model:GameBridge.bestiaryEntries()
                             delegate:Rectangle{width:220;height:122;color:root.cBg3;border.color:modelData.spared?root.cTeal:root.cBorder;border.width:modelData.spared?1:1;radius:10
@@ -671,7 +679,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Inventaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
+                        Text{text:"Inventaire";font.family:"Georgia";font.pixelSize:21;font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         Text{text:"Utilisez vos objets ici (hors combat) ou cliquez dessus pendant le combat.";font.pixelSize:12;color:root.cText3;font.italic:true;wrapMode:Text.Wrap;Layout.fillWidth:true}
 
@@ -707,7 +715,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Statistiques";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
+                        Text{text:"Statistiques";font.family:"Georgia";font.pixelSize:21;font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
 
                         GridLayout{columns:2;Layout.fillWidth:true;columnSpacing:12;rowSpacing:12
@@ -763,7 +771,7 @@ ApplicationWindow {
                 // ────────────────────────────────────────────────────
                 Rectangle { color:"transparent"
                     ColumnLayout{anchors.fill:parent;anchors.margins:24;spacing:14
-                        Text{text:"Choisir un adversaire";font.family:"Georgia";font.pixelSize:21;font.font.letterSpacing:1;color:root.cGold2}
+                        Text{text:"Choisir un adversaire";font.family:"Georgia";font.pixelSize:21;font.letterSpacing:1;color:root.cGold2}
                         Rectangle{Layout.fillWidth:true;height:1;color:root.cBorder}
                         Text{text:"Cliquez sur un monstre pour lancer le combat directement contre lui.";font.pixelSize:12;color:root.cText3;font.italic:true}
 

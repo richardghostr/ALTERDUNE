@@ -43,8 +43,9 @@ bool GameBridge::loadData(const QString &itemsPath, const QString &monstersPath)
     for (auto &m : mons)
         monstersPool_.push_back(std::shared_ptr<Monster>(std::move(m)));
 
+    initialItems_ = items;
     player_ = std::make_unique<Player>("", 100);
-    for (const auto &it : items) player_->addItem(it);
+    for (const auto &it : initialItems_) player_->addItem(it);
 
     dataReady_ = true;
     emit logMessage("Donnees chargees avec succes.", "system");
@@ -56,21 +57,9 @@ bool GameBridge::loadData(const QString &itemsPath, const QString &monstersPath)
 // Game lifecycle
 // ─────────────────────────────────────────────────────────────────
 void GameBridge::newGame(const QString &playerName) {
-    // Reset player but keep items loaded
-    std::vector<Item> savedItems;
-    if (player_) savedItems.reserve(player_->listItems().size());
-    // reload fresh items from pool (already loaded)
     player_ = std::make_unique<Player>(playerName.toStdString(), 100);
-    // re-add items from pool snapshot
-    for (auto &m : monstersPool_) { Q_UNUSED(m) } // just to avoid unused warning
-    // We need items — reload from data directly via FileLoader is cleanest
-    // But we already have them in the original pool; store them at loadData time instead.
-    // Simple approach: keep a saved copy of items.
-    // For now reload from file (path stored would need a member; simpler: keep savedItems_)
-    // Actually: player starts with default items. We call loadData again to get fresh items.
-    // Simplest fix: store initial items at loadData time.
-    // ---- Since we don't have a member for that, we call loadData paths.
-    // We'll just reinitialize properly. The player_ is already created above.
+    for (const auto &it : initialItems_) player_->addItem(it);
+    bestiary_ = Bestiary();
     enemy_.reset();
     lastDmgPlayer_ = 0;
     lastDmgEnemy_  = 0;
@@ -80,14 +69,11 @@ void GameBridge::newGame(const QString &playerName) {
 
 void GameBridge::resetGame() {
     enemy_.reset();
-    player_.reset();
     bestiary_ = Bestiary();
     lastDmgPlayer_ = 0;
     lastDmgEnemy_  = 0;
-    // Reload fresh player with items
-    if (dataReady_) {
-        player_ = std::make_unique<Player>("", 100);
-    }
+    player_ = std::make_unique<Player>("", 100);
+    for (const auto &it : initialItems_) player_->addItem(it);
     emit stateChanged();
 }
 
@@ -342,6 +328,7 @@ void GameBridge::playerMercy() {
 // Ending
 // ─────────────────────────────────────────────────────────────────
 QString GameBridge::endingType() const {
+    if (!player_)               return "neutral";
     int k = playerKills(), s = playerSpares();
     if (!player_->isAlive())    return "death";
     if (k > 0 && s == 0)       return "genocide";

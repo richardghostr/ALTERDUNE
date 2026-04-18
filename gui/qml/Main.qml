@@ -92,7 +92,15 @@ ApplicationWindow {
     Connections {
         target: GameBridge
         function onLogMessage(msg, type) { root.log(msg, type) }
-        function onStateChanged()        { /* properties auto-update */ }
+        function onStateChanged()        {
+            // Diagnostic: log key model sizes and combat state
+            var ea = 0, inv = 0, be = 0, mp = 0
+            try { ea = GameBridge.enemyActs ? GameBridge.enemyActs.length : 0 } catch(e) {}
+            try { inv = GameBridge.inventory ? GameBridge.inventory.length : 0 } catch(e) {}
+            try { be = GameBridge.bestiaryEntries ? GameBridge.bestiaryEntries.length : 0 } catch(e) {}
+            try { mp = GameBridge.monsterPool ? GameBridge.monsterPool.length : 0 } catch(e) {}
+            root.log("StateChanged: inCombat=" + GameBridge.inCombat + " | enemyActs=" + ea + " | inventory=" + inv + " | bestiary=" + be + " | pool=" + mp, "system")
+        }
         function onEncounterStarted()    { root.subMode = ""; root.page = 1 }
         function onEncounterEnded(won)   { if (won) root.subMode = "" }
         function onPlayerDied()          { root.showEnding = true }
@@ -544,7 +552,7 @@ ApplicationWindow {
 
                                 // 4 boutons d'action — visibles seulement en combat
                                 GridLayout { visible: GameBridge.inCombat; columns:4; Layout.fillWidth:true; columnSpacing:10
-                                    Repeater {
+                                            Repeater {
                                         model:[
                                             {l:"⚔ FIGHT", bg:"#2a0808",bc:root.cRed,    tc:"#f09595",a:"fight"},
                                             {l:"◈ ACT",   bg:"#0a1f1e",bc:root.cTeal,   tc:root.cTealLt,a:"act"},
@@ -566,9 +574,15 @@ ApplicationWindow {
                                             Text{anchors.centerIn:parent;text:modelData.l;color:modelData.tc;font.family:"Georgia";font.pixelSize:14;font.bold:true;font.letterSpacing:1}
                                             HoverHandler{id:bh}
                                             TapHandler{onTapped:{
-                                                if(modelData.a==="fight")      { root.subMode=""; GameBridge.playerFight() }
-                                                else if(modelData.a==="mercy") { root.subMode=""; GameBridge.playerMercy() }
-                                                else root.subMode = root.subMode===modelData.a ? "" : modelData.a
+                                                root.log("Action button tapped: " + modelData.a, "system")
+                                                if(modelData.a==="fight")      { root.subMode=""; GameBridge.playerFight(); root.log("Invoked playerFight", "system") }
+                                                else if(modelData.a==="mercy") { root.subMode=""; GameBridge.playerMercy(); root.log("Invoked playerMercy", "system") }
+                                                else {
+                                                    root.subMode = root.subMode===modelData.a ? "" : modelData.a;
+                                                    root.log("Toggled subMode -> " + root.subMode, "system");
+                                                    // Ask C++ bridge to refresh properties so models update immediately
+                                                    GameBridge.requestStateUpdate();
+                                                }
                                             }}
                                         }
                                     }

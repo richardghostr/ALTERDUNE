@@ -149,6 +149,7 @@ QVariantList GameBridge::inventory() const {
 QVariantList GameBridge::enemyActs() const {
     QVariantList out;
     if (!enemy_) return out;
+    qDebug() << "[GameBridge] enemyActs() called; actIds size=" << enemy_->actIds().size();
     auto ids     = enemy_->actIds();
     int  maxActs = std::min(enemy_->actCount(), (int)ids.size());
     for (int i = 0; i < maxActs; ++i) {
@@ -225,6 +226,8 @@ void GameBridge::startEncounterWith(int poolIndex) {
     emit logMessage(QString("Un ennemi apparait : %1 [%2]")
                         .arg(QString::fromStdString(enemy_->getName()))
                         .arg(categoryStr(enemy_->category())), "system");
+    emit logMessage(QString("Monstre acts count (template) = %1, (instance) = %2")
+                        .arg(tmpl->actIds().size()).arg(enemy_->actIds().size()), "system");
     emit encounterStarted();
     emit stateChanged();
 }
@@ -353,6 +356,11 @@ void GameBridge::playerMercy() {
                             .arg(enemy_->getMercy()).arg(enemy_->getMercyGoal()), "error");
         emit stateChanged();
     }
+}
+
+void GameBridge::requestStateUpdate() {
+    emit logMessage("Requesting state update from QML", "system");
+    emit stateChanged();
 }
 
 // ─────────────────────────────────────────────────────────────────

@@ -72,6 +72,9 @@ public:
     Q_INVOKABLE bool playerUseItem(const QString &itemName);
     Q_INVOKABLE void playerMercy();
 
+    // Force QML to refresh bound properties
+    Q_INVOKABLE void requestStateUpdate();
+
     Q_INVOKABLE QString endingType()  const;
     Q_INVOKABLE QString endingTitle() const;
     Q_INVOKABLE QString endingText()  const;

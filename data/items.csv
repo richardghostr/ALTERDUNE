@@ -1,5 +1,5 @@
-Potion;HEAL;15;3
-Snack;HEAL;8;5
-SuperPotion;HEAL;30;1
-Elixir;HEAL;50;1
-Bandage;HEAL;10;2
+Potion;HEAL;30;3
+Snack;HEAL;20;5
+SuperPotion;HEAL;60;1
+Elixir;HEAL;80;1
+Bandage;HEAL;70;2

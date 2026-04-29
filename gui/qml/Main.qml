@@ -455,21 +455,7 @@ ApplicationWindow {
                                         }
                                     }
                                     // items rapides
-                                    RowLayout { spacing:6
-                                        Repeater { model: GameBridge.inventory
-                                            delegate: Rectangle {
-                                                visible: modelData.qty>0; height:24
-                                                width: itmLbl.implicitWidth+16; radius:4
-                                                color:"#1a1400"; border.color:"#633806"; border.width:1
-                                                Text { id:itmLbl; anchors.centerIn:parent; text:modelData.name+" x"+modelData.qty; font.pixelSize:10; color:"#fac775" }
-                                                HoverHandler{id:itemQuickHov}
-                                                TapHandler { onTapped: {
-                                                    if(GameBridge.inCombat) GameBridge.playerUseItem(modelData.name)
-                                                }}
-                                                ToolTip { visible:itemQuickHov.hovered; text:"Cliquer pour utiliser "+modelData.name+" (+"+modelData.value+" HP)"; delay:400 }
-                                            }
-                                        }
-                                    }
+                                    
                                 }
 
                                 Text { text:"VS"; font.family:"Georgia"; font.pixelSize:22; color:root.cBorder2; Layout.alignment:Qt.AlignVCenter }

@@ -330,13 +330,15 @@ void Game::startCombat() {
 			// Monster damage draws up to the player's CURRENT HP
 			std::uniform_int_distribution<> dmgDist2(0, std::max(0, player_->getHP()));
 			int dmg = dmgDist2(gen);
+			// Apply monster damage multiplier (0.5)
+			int applied = dmg / 2; // integer division, rounds down
 			cout << "\n  -- Tour du monstre --\n";
-			if (dmg == 0)
+			if (applied == 0)
 				cout << "  " << enemy->getName() << " rate son attaque.\n";
 			else {
-				player_->takeDamage(dmg);
-				cout << "  " << enemy->getName() << " inflige " << dmg
-				     << " degats. (HP joueur : " << player_->getHP() << ")\n";
+				player_->takeDamage(applied);
+				cout << "  " << enemy->getName() << " inflige " << applied
+					 << " degats. (HP joueur : " << player_->getHP() << ")\n";
 			}
 			if (!player_->isAlive()) {
 				cout << "\n  Vous etes mort. Fin de la partie.\n";

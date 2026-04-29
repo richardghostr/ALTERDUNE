@@ -240,15 +240,17 @@ void GameBridge::monsterAttack() {
     // Monster damage: draw up to player's current HP to avoid overkill
     std::uniform_int_distribution<int> dist(0, std::max(0, player_->getHP()));
     int dmg = dist(rng_);
-    lastDmgPlayer_ = dmg;
-    if (dmg == 0) {
+    // Apply monster damage multiplier (0.5)
+    int applied = dmg / 2;
+    lastDmgPlayer_ = applied;
+    if (applied == 0) {
         emit logMessage(QString("%1 rate son attaque !").arg(QString::fromStdString(enemy_->getName())), "miss");
     } else {
-        player_->takeDamage(dmg);
+        player_->takeDamage(applied);
         emit logMessage(QString("%1 vous inflige %2 degats. (HP : %3/%4)")
                             .arg(QString::fromStdString(enemy_->getName()))
-                            .arg(dmg).arg(player_->getHP()).arg(player_->getHPMax()), "monster");
-        emit damageFlash(true, dmg);
+                            .arg(applied).arg(player_->getHP()).arg(player_->getHPMax()), "monster");
+        emit damageFlash(true, applied);
     }
     if (!player_->isAlive()) {
         emit logMessage("Vous etes tombe au combat. Fin de la partie.", "death");

@@ -237,7 +237,8 @@ void GameBridge::startEncounterWith(int poolIndex) {
 // ─────────────────────────────────────────────────────────────────
 void GameBridge::monsterAttack() {
     if (!enemy_ || !player_) return;
-    std::uniform_int_distribution<int> dist(0, player_->getHPMax());
+    // Monster damage: draw up to player's current HP to avoid overkill
+    std::uniform_int_distribution<int> dist(0, std::max(0, player_->getHP()));
     int dmg = dist(rng_);
     lastDmgPlayer_ = dmg;
     if (dmg == 0) {
@@ -287,7 +288,8 @@ void GameBridge::endEncounter(bool spared) {
 // ─────────────────────────────────────────────────────────────────
 void GameBridge::playerFight() {
     if (!enemy_ || !player_ || !player_->isAlive()) return;
-    std::uniform_int_distribution<int> dist(0, enemy_->getHPMax());
+    // Player damage: draw up to enemy's current HP to avoid overkill
+    std::uniform_int_distribution<int> dist(0, std::max(0, enemy_->getHP()));
     int dmg = dist(rng_);
     lastDmgEnemy_ = dmg;
     if (dmg == 0) {

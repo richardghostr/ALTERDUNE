@@ -231,7 +231,8 @@ void Game::startCombat() {
 
 		// ── FIGHT ──
 		if (choice == "1") {
-			std::uniform_int_distribution<> dmgDist(0, enemy->getHPMax());
+			// Draw damage up to the enemy's CURRENT HP (prevents overkill beyond current HP)
+			std::uniform_int_distribution<> dmgDist(0, std::max(0, enemy->getHP()));
 			int dmg = dmgDist(gen);
 			if (dmg == 0)
 				cout << "  Votre attaque rate !\n";
@@ -326,7 +327,8 @@ void Game::startCombat() {
 
 		// ── Tour du monstre ──
 		if (!combatOver && enemy->isAlive()) {
-			std::uniform_int_distribution<> dmgDist2(0, player_->getHPMax());
+			// Monster damage draws up to the player's CURRENT HP
+			std::uniform_int_distribution<> dmgDist2(0, std::max(0, player_->getHP()));
 			int dmg = dmgDist2(gen);
 			cout << "\n  -- Tour du monstre --\n";
 			if (dmg == 0)

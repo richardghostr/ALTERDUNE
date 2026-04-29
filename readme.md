@@ -64,6 +64,31 @@ Remarques :
 - Lancez l'exécutable depuis la racine du projet afin que les fichiers `data/items.csv` et `data/monsters.csv` soient trouvés par `main`.
 - Le binaire console force désormais l'encodage UTF-8 sous Windows au démarrage, vous n'avez normalement plus besoin d'exécuter `chcp 65001` manuellement.
 
+**Déploiement GUI autonome (Windows)**
+
+- Objectif : permettre d'exécuter la partie Qt/QML du jeu sur une machine cible même si Qt/MSYS n'y sont pas installés.
+
+- Méthode recommandée (simple) — utiliser `windeployqt` fourni avec Qt. Exemple :
+
+```powershell
+.
+scripts\deploy_windows.bat "C:\path\to\alterdune_qt.exe" "C:\path\to\ALTERDUNE\gui\qml"
+```
+
+Le script appelle `windeployqt --qmldir ...` pour rassembler automatiquement les DLL Qt, plugins (`platforms\qwindows.dll`) et les imports QML nécessaires.
+
+- Fallback manuel (si `windeployqt` non disponible) — éléments à empaqueter près de l'exécutable :
+	- Les DLL runtime MinGW (ex. `libstdc++-6.dll`, `libgcc_s_seh-1.dll` / `libgcc_s_dw2-1.dll`, `libwinpthread-1.dll`).
+	- Les DLL Qt utilisées (ex. `Qt6Core.dll`, `Qt6Gui.dll`, `Qt6Qml.dll`, `Qt6Quick.dll`, ... selon la build).
+	- Le dossier `platforms` contenant `qwindows.dll`.
+	- Le dossier `qml`/imports (ou le contenu généré par `windeployqt --qmldir`) pour que QML trouve ses modules.
+
+- Remarques :
+	- `windeployqt` doit correspondre à la même version de Qt que celle utilisée pour compiler l'exécutable.
+	- La méthode la plus sûre est d'utiliser une build release et `windeployqt` pour éviter d'oublier un plugin.
+	- Pour créer un installeur, utilisez NSIS, Inno Setup, ou l'outil Qt Installer Framework.
+
+
 Option C — Interface graphique avec Qt (QML)
 
 ```bash

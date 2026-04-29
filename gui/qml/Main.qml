@@ -34,6 +34,7 @@ ApplicationWindow {
     // ── UI state ─────────────────────────────────────────────────────
     property int  page: 0   // 0=home 1=combat 2=bestiary 3=inventory 4=stats 5=monsterSelect
     property bool showName: true
+    property bool showTutorial: false
     property bool showEnding: false
     property bool showDmgFlash: false
     property bool flashIsPlayer: false
@@ -82,7 +83,9 @@ ApplicationWindow {
         var n = nameField.text.trim() !== "" ? nameField.text.trim() : "Aventurier"
         GameBridge.newGame(n)
         root.showName = false
-        root.log("Bienvenue, " + n + " ! Votre aventure commence.", "system")
+        // Show tutorial as the first UI after name entry
+        root.showTutorial = true
+        root.log("Bienvenue, " + n + " ! Consultez le tutoriel pour commencer.", "system")
     }
 
     Component.onCompleted: {
@@ -106,6 +109,92 @@ ApplicationWindow {
     }
 
     Timer { id: flashTimer; interval: 600; onTriggered: root.showDmgFlash = false }
+
+    // ════════════════════════════════════════════════════════════════
+    // TUTORIAL OVERLAY
+    // ════════════════════════════════════════════════════════════════
+    Rectangle {
+        id: tutorialOverlay
+        visible: root.showTutorial
+        anchors.fill: parent; color: "#e0000000"; z: 210
+
+        Rectangle {
+            anchors.centerIn: parent; width: 820; height: 560
+            color: root.cBg3; border.color: root.cGold; border.width: 1; radius: 12
+
+            ColumnLayout { anchors.fill: parent; anchors.margins: 18; spacing: 12
+                RowLayout { Layout.fillWidth: true; spacing: 8
+                    Text { text: "Tutoriel — Premiers pas"; font.family: "Georgia"; font.pixelSize: 20; color: root.cGold2 }
+                    Item { Layout.fillWidth: true }
+                    Rectangle { width:28; height:28; radius:6; color:root.cBg4; border.color:root.cBorder
+                        Text { anchors.centerIn: parent; text: "✕"; color: root.cText2 }
+                        TapHandler { onTapped: root.showTutorial = false }
+                    }
+                }
+
+                Rectangle { Layout.fillWidth: true; height: 1; color: root.cBorder }
+
+                ScrollView { Layout.fillWidth: true; Layout.fillHeight: true; clip: true
+                    Column { width: parent.width; spacing: 12; padding: 6
+                        // Presentation
+                        Text { text: "Présentation"; font.pixelSize: 14; color: root.cGold2 }
+                        Text { text: "Jeu RPG tour par tour — Objectif : gagner 10 combats."; font.pixelSize: 12; color: root.cText; wrapMode: Text.WordWrap }
+
+                        // Commands
+                        Text { text: "Commandes"; font.pixelSize: 14; color: root.cGold2 }
+                        Column { spacing:6
+                            Text { text: "• FIGHT : attaquer"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• ACT : interagir avec le monstre (modifie Mercy)"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• ITEM : utiliser un objet"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• MERCY : épargner un monstre si possible"; font.pixelSize: 12; color: root.cText }
+                        }
+
+                        // Mercy system
+                        Text { text: "Système Mercy"; font.pixelSize: 14; color: root.cGold2 }
+                        Text { text: "Certaines actions modifient la jauge Mercy. Si Mercy ≥ 100 → possibilité d'épargner."; font.pixelSize: 12; color: root.cText; wrapMode: Text.WordWrap }
+
+                        // Monster types
+                        Text { text: "Types de monstres"; font.pixelSize: 14; color: root.cGold2 }
+                        Column { spacing:6
+                            Text { text: "• NORMAL : 2 actions ACT"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• MINIBOSS : 3 actions"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• BOSS : 4 actions"; font.pixelSize: 12; color: root.cText }
+                        }
+
+                        // Endings
+                        Text { text: "Fins du jeu"; font.pixelSize: 14; color: root.cGold2 }
+                        Column { spacing:6
+                            Text { text: "• Génocidaire — tues beaucoup de monstres"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• Pacifiste — épargnes beaucoup"; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• Neutre — mix des deux"; font.pixelSize: 12; color: root.cText }
+                        }
+
+                        // Items
+                        Text { text: "Items"; font.pixelSize: 14; color: root.cGold2 }
+                        Text { text: "Les items restaurent des HP. Utilisables en combat et hors combat."; font.pixelSize: 12; color: root.cText }
+
+                        // Short tips
+                        Text { text: "Conseils rapides"; font.pixelSize: 14; color: root.cGold2 }
+                        Column { spacing:6
+                            Text { text: "• Utilisez ACT pour réduire Mercy ou provoquer des effets."; font.pixelSize: 12; color: root.cText }
+                            Text { text: "• Surveillez votre HP et utilisez des items au bon moment."; font.pixelSize: 12; color: root.cText }
+                        }
+                    }
+                }
+
+                RowLayout { Layout.fillWidth: true; spacing: 12; Layout.alignment: Qt.AlignHCenter
+                    Rectangle { width:200; height:44; radius:8; color:root.cTealLt; border.color:root.cGold; border.width:1
+                        Text { anchors.centerIn: parent; text: "Accéder au menu principal"; color: "#07110f"; font.bold: true }
+                        TapHandler { onTapped: { root.showTutorial = false; root.page = 0 } }
+                    }
+                    Rectangle { width:160; height:44; radius:8; color:root.cBg4; border.color:root.cBorder; border.width:1
+                        Text { anchors.centerIn: parent; text: "Fermer"; color: root.cText2 }
+                        TapHandler { onTapped: root.showTutorial = false }
+                    }
+                }
+            }
+        }
+    }
 
     // ════════════════════════════════════════════════════════════════
     // ÉCRAN SAISIE NOM

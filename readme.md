@@ -62,7 +62,7 @@ g++ -std=c++17 -Wall -Wextra -Iinclude -g src/*.cpp -o src/output/main
 Remarques :
 - Le `Makefile` (cible par défaut) produit un exécutable `alterdune` à la racine du projet sous Windows il sera nommé `alterdune.exe`.
 - Lancez l'exécutable depuis la racine du projet afin que les fichiers `data/items.csv` et `data/monsters.csv` soient trouvés par `main`.
-- Sous PowerShell, si vous avez des caractères box-drawing/UTF-8 illisibles, exécutez `chcp 65001` avant de lancer le jeu pour forcer l'encodage UTF-8.
+- Le binaire console force désormais l'encodage UTF-8 sous Windows au démarrage, vous n'avez normalement plus besoin d'exécuter `chcp 65001` manuellement.
 
 Option C — Interface graphique avec Qt (QML)
 
